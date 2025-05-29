@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RasaKita - Pemesanan Makanan Online</title>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com data:; img-src 'self' https://images.unsplash.com https://media.istockphoto.com https://via.placeholder.com https://plus.unsplash.com data:">
+  </head>
+  <body>
+    <div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+      <div style="text-align: center;">
+        <div class="logo">
+          <h1>Rasa <span style="color: #ff4757;">Kita</span>
+          </h1>
+        </div>
+        <p>Memuat halaman...</p>
+        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #ff4757; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto;"></div>
+      </div>
+    </div>
+    <div id="landingPage" class="landing-page">
+      <div class="landing-container">
+        <h1>Rasa <span style="color: var(--primary-color);">Kita</span>
+        </h1>
+        <p>Nikmati pengalaman kuliner terbaik dengan makanan berkualitas dari restoran terbaik</p>
+        <div class="landing-buttons">
+          <button class="btn-primary" onclick="Modal.openModal('loginModal')">Masuk</button>
+          <button class="btn-secondary" onclick="Modal.openModal('registerModal')">Daftar</button>
+        </div>
+      </div>
+    </div>
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Masuk ke Akun</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" name="loginEmail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan alamat email yang valid">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" name="loginPassword" required minlength="6">
+          </div>
+          <input type="hidden" id="login_csrf_token" name="login_csrf_token" value="">
+          <button type="submit" class="btn-primary" style="width: 100%;">Masuk</button>
+          <p style="text-align: center; margin-top: 15px;"> Belum punya akun? <a href="#" id="showRegisterBtn" style="color: var(--primary-color);">Daftar Sekarang</a>
+          </p>
+        </form>
+      </div>
+    </div>
+    <div id="registerModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Daftar Akun Baru</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="registerName">Nama Lengkap</label>
+            <input type="text" id="registerName" name="registerName" required minlength="3" maxlength="50" pattern="[A-Za-z\s]+" title="Hanya huruf dan spasi yang diperbolehkan">
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" name="registerEmail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan alamat email yang valid">
+          </div>
+          <div class="form-group">
+            <label for="registerPhone">Nomor Telepon</label>
+            <input type="tel" id="registerPhone" name="registerPhone" required pattern="[0-9]{10,13}" title="Masukkan 10-13 digit nomor telepon">
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" name="registerPassword" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Konfirmasi Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+          </div>
+          <input type="hidden" id="register_csrf_token" name="register_csrf_token" value="">
+          <button type="submit" class="btn-primary" style="width: 100%;">Daftar</button>
+          <p style="text-align: center; margin-top: 15px;"> Sudah punya akun? <a href="#" id="showLoginBtn" style="color: var(--primary-color);">Masuk</a>
+          </p>
+        </form>
+      </div>
+    </div>
+    <div class="auth-required" id="mainContent">
+      <header>
+        <div class="container">
+          <div class="logo">
+            <h1>Rasa <span>Kita</span>
+            </h1>
+          </div>
+          <nav>
+            <ul>
+              <li>
+                <a href="#beranda">Beranda</a>
+              </li>
+              <li>
+                <a href="#menu">Menu</a>
+              </li>
+              <li>
+                <a href="#tentang">Tentang Kami</a>
+              </li>
+              <li>
+                <a href="#kontak">Kontak</a>
+              </li>
+              <li>
+                <a href="#" id="accountBtn">
+                  <span id="userNameDisplay">Akun Saya</span>
+                  <i class="fas fa-user"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <div class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count">0</span>
+          </div>
+          <div class="account-dropdown" id="accountDropdown">
+            <div class="dropdown-menu">
+              <div class="user-info" id="userInfo"></div>
+              <a href="#" id="profileBtn">
+                <i class="fas fa-user-circle"></i> Profil Saya </a>
+              <a href="#" id="ordersBtn">
+                <i class="fas fa-shopping-bag"></i> Pesanan Saya </a>
+              <a href="#" id="logoutBtn" class="logout">
+                <i class="fas fa-sign-out-alt"></i> Keluar </a>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section id="beranda" class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <h1>Nikmati Kuliner Terbaik</h1>
+            <p>Pesan makanan favorit Anda dari restoran-restoran terbaik di kota ini</p>
+            <button class="btn-primary" onclick="scrollToMenu()">Lihat Menu</button>
+          </div>
+        </div>
+      </section>
+      <section id="menu" class="menu-section">
+        <div class="container">
+          <h2 class="section-title">Menu Kami</h2>
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Cari menu...">
+            <button id="searchBtn">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <div class="category-filter">
+            <button class="category-btn active" data-category="all">Semua</button>
+            <button class="category-btn" data-category="makanan-utama">Makanan Utama</button>
+            <button class="category-btn" data-category="makanan-ringan">Makanan Ringan</button>
+            <button class="category-btn" data-category="minuman">Minuman</button>
+            <button class="category-btn" data-category="dessert">Dessert</button>
+          </div>
+          <div class="menu-items"></div>
+          <div class="menu-item" data-category="makanan-utama">
+            <div class="menu-image">
+              <img data-src="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nasi Goreng">
+            </div>
+            <div class="menu-info">
+              <h3>Nasi Goreng Spesial</h3>
+              <p class="menu-description">Nasi goreng dengan telur, ayam, udang, dan sayuran segar</p>
+              <p class="menu-price">Rp 35.000</p>
+              <button class="add-to-cart" data-id="1" data-name="Nasi Goreng Spesial" data-price="35000" data-img="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="makanan-utama">
+            <div class="menu-image">
+              <img data-src="https://media.istockphoto.com/id/1451323978/photo/baked-chicken-wings-with-sweet-chili-sauce-in-a-plate-black-background-top-view.webp?a=1&b=1&s=612x612&w=0&k=20&c=16utPxh1GnWO1lPSMPHAuKQWGvU_MEVa4_HIS4VapjE=" alt="Ayam Bakar">
+            </div>
+            <div class="menu-info">
+              <h3>Ayam Bakar Madu</h3>
+              <p class="menu-description">Ayam yang dibakar dengan bumbu madu khas, disajikan dengan nasi dan lalapan</p>
+              <p class="menu-price">Rp 45.000</p>
+              <button class="add-to-cart" data-id="2" data-name="Ayam Bakar Madu" data-price="45000" data-img="https://media.istockphoto.com/id/1451323978/photo/baked-chicken-wings-with-sweet-chili-sauce-in-a-plate-black-background-top-view.webp?a=1&b=1&s=612x612&w=0&k=20&c=16utPxh1GnWO1lPSMPHAuKQWGvU_MEVa4_HIS4VapjE=">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="makanan-utama">
+            <div class="menu-image">
+              <img data-src="https://images.unsplash.com/photo-1696385793104-745d4dd65c5a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Q2hpY2tlbiUyMFNhdGF5fGVufDB8fDB8fHww" alt="Sate Ayam">
+            </div>
+            <div class="menu-info">
+              <h3>Sate Ayam</h3>
+              <p class="menu-description">Sate ayam dengan bumbu kacang khas, disajikan dengan lontong</p>
+              <p class="menu-price">Rp 30.000</p>
+              <button class="add-to-cart" data-id="3" data-name="Sate Ayam" data-price="30000" data-img="https://images.unsplash.com/photo-1696385793104-745d4dd65c5a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Q2hpY2tlbiUyMFNhdGF5fGVufDB8fDB8fHww">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="makanan-utama">
+            <div class="menu-image">
+              <img data-src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8" alt="Rendang">
+            </div>
+            <div class="menu-info">
+              <h3>Rendang Sapi</h3>
+              <p class="menu-description">Daging sapi yang dimasak dengan rempah khas padang</p>
+              <p class="menu-price">Rp 50.000</p>
+              <button class="add-to-cart" data-id="4" data-name="Rendang Sapi" data-price="50000" data-img="https://images.unsplash.com/photo-1563379926898-05f4575a45d8">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="makanan-ringan">
+            <div class="menu-image">
+              <img data-src="https://media.istockphoto.com/id/476743123/photo/chinese-dimsum.webp?a=1&b=1&s=612x612&w=0&k=20&c=xtgRtwWG_n_CqszRFDeT7wI17YyjgPcpHpTJ-D8asIo=" alt="Dimsum">
+            </div>
+            <div class="menu-info">
+              <h3>Dimsum Paket Spesial</h3>
+              <p class="menu-description">Berbagai macam dimsum yang dikukus hingga sempurna</p>
+              <p class="menu-price">Rp 28.000</p>
+              <button class="add-to-cart" data-id="5" data-name="Dimsum Paket Spesial" data-price="28000" data-img="https://media.istockphoto.com/id/476743123/photo/chinese-dimsum.webp?a=1&b=1&s=612x612&w=0&k=20&c=xtgRtwWG_n_CqszRFDeT7wI17YyjgPcpHpTJ-D8asIo=">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="makanan-ringan">
+            <div class="menu-image">
+              <img data-src="https://media.istockphoto.com/id/1475780243/photo/pile-of-french-fries-over-black-background.webp?a=1&b=1&s=612x612&w=0&k=20&c=be_4I1Ay44LviVqOV-mIhraHr9rDcfkjqdSXF7PwraM=" alt="Kentang Goreng">
+            </div>
+            <div class="menu-info">
+              <h3>Kentang Goreng</h3>
+              <p class="menu-description">Kentang goreng renyah dengan saus pilihan</p>
+              <p class="menu-price">Rp 20.000</p>
+              <button class="add-to-cart" data-id="6" data-name="Kentang Goreng" data-price="20000" data-img="https://media.istockphoto.com/id/1475780243/photo/pile-of-french-fries-over-black-background.webp?a=1&b=1&s=612x612&w=0&k=20&c=be_4I1Ay44LviVqOV-mIhraHr9rDcfkjqdSXF7PwraM=">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="minuman">
+            <div class="menu-image">
+              <img data-src="https://images.unsplash.com/photo-1544145945-f90425340c7e" alt="Es Teh">
+            </div>
+            <div class="menu-info">
+              <h3>Es Teh Manis</h3>
+              <p class="menu-description">Teh manis segar dengan es batu</p>
+              <p class="menu-price">Rp 8.000</p>
+              <button class="add-to-cart" data-id="7" data-name="Es Teh Manis" data-price="8000" data-img="https://images.unsplash.com/photo-1544145945-f90425340c7e">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="minuman">
+            <div class="menu-image">
+              <img data-src="https://media.istockphoto.com/id/453010753/photo/three-fruit-juice-glasses-surrounded-by-colorful-fruits.webp?a=1&b=1&s=612x612&w=0&k=20&c=3BXu9Y4s7rfWqScGhXqpcqaCJ1kCvq8nc8SB8IKcHxA=" alt="Jus Buah">
+            </div>
+            <div class="menu-info">
+              <h3>Jus Buah Segar</h3>
+              <p class="menu-description">Jus buah segar dengan pilihan buah musiman</p>
+              <p class="menu-price">Rp 15.000</p>
+              <button class="add-to-cart" data-id="8" data-name="Jus Buah Segar" data-price="15000" data-img="https://media.istockphoto.com/id/453010753/photo/three-fruit-juice-glasses-surrounded-by-colorful-fruits.webp?a=1&b=1&s=612x612&w=0&k=20&c=3BXu9Y4s7rfWqScGhXqpcqaCJ1kCvq8nc8SB8IKcHxA=">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="dessert">
+            <div class="menu-image">
+              <img data-src="https://media.istockphoto.com/id/1183134960/photo/mini-cheesecake-bites-on-a-three-tier-dessert-stand.webp?a=1&b=1&s=612x612&w=0&k=20&c=tyDwBmNm4D1ZhP3z0KMtvU1FbLVVK5YtS4ua9bypALE=" alt="Cheesecake">
+            </div>
+            <div class="menu-info">
+              <h3>Cheesecake Premium</h3>
+              <p class="menu-description">Cheesecake lembut dengan topping buah</p>
+              <p class="menu-price">Rp 25.000</p>
+              <button class="add-to-cart" data-id="9" data-name="Cheesecake Premium" data-price="25000" data-img="https://media.istockphoto.com/id/1183134960/photo/mini-cheesecake-bites-on-a-three-tier-dessert-stand.webp?a=1&b=1&s=612x612&w=0&k=20&c=tyDwBmNm4D1ZhP3z0KMtvU1FbLVVK5YtS4ua9bypALE=">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+          <div class="menu-item" data-category="dessert">
+            <div class="menu-image">
+              <img data-src="https://plus.unsplash.com/premium_photo-1684952851239-a9cc9567884e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8MyUyMEZsYXZvciUyMEljZSUyMENyZWFtfGVufDB8fDB8fHww" alt="Es Krim">
+            </div>
+            <div class="menu-info">
+              <h3>Es Krim 3 Rasa</h3>
+              <p class="menu-description">Es krim premium dengan 3 pilihan rasa</p>
+              <p class="menu-price">Rp 18.000</p>
+              <button class="add-to-cart" data-id="10" data-name="Es Krim 3 Rasa" data-price="18000" data-img="https://plus.unsplash.com/premium_photo-1684952851239-a9cc9567884e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8MyUyMEZsYXZvciUyMEljZSUyMENyZWFtfGVufDB8fDB8fHww">
+                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang </button>
+            </div>
+          </div>
+        </div>
+    </div>
+    </section>
+    <div id="cartModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Keranjang Belanja</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total"> Total: <span id="cartTotal">Rp 0</span>
+        </div>
+        <button class="btn-primary" id="checkoutBtn" style="margin-top: 20px;">Lanjutkan ke Pembayaran</button>
+      </div>
+    </div>
+    <div id="checkoutModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Formulir Pemesanan</h2>
+        <form id="checkoutForm">
+          <div class="form-group">
+            <label for="name">Nama Lengkap</label>
+            <input type="text" id="name" name="name" required minlength="3" maxlength="50" pattern="[A-Za-z\s]+" title="Hanya huruf dan spasi yang diperbolehkan">
+          </div>
+          <div class="form-group">
+            <label for="phone">Nomor Telepon</label>
+            <input type="tel" id="phone" name="phone" required pattern="[0-9]{10,13}" title="Masukkan 10-13 digit nomor telepon">
+          </div>
+          <div class="form-group">
+            <label for="address">Alamat Pengiriman</label>
+            <textarea id="address" name="address" required minlength="10" maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="paymentMethod">Metode Pembayaran</label>
+            <select id="paymentMethod" name="paymentMethod" required>
+              <option value="">Pilih metode pembayaran</option>
+              <option value="transfer">Transfer Bank</option>
+              <option value="cod">Bayar di Tempat (COD)</option>
+              <option value="ewallet">E-Wallet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="notes">Catatan Pesanan (Opsional)</label>
+            <textarea id="notes" name="notes" maxlength="100"></textarea>
+          </div>
+          <input type="hidden" id="csrf_token" name="csrf_token" value="">
+          <button type="submit" class="btn-primary">Pesan Sekarang</button>
+        </form>
+      </div>
+    </div>
+    <div id="confirmationModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Pesanan Berhasil!</h2>
+        <p>Terima kasih telah memesan di RasaKita. Berikut detail pesanan Anda:</p>
+        <div id="orderDetails"></div>
+        <p>Pesanan Anda akan segera diproses. Anda akan menerima konfirmasi melalui nomor telepon yang telah diinputkan.</p>
+        <button class="btn-primary" onclick="closeConfirmationModal()">Kembali ke Menu</button>
+      </div>
+    </div>
+    <section id="tentang" class="menu-section">
+      <div class="container">
+        <h2 class="section-title">Tentang Kami</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 40px;"> RasaKita adalah layanan pemesanan makanan online yang menghubungkan Anda dengan masakan lezat dari restoran-restoran terbaik. Kami berkomitmen untuk memberikan pengalaman kuliner terbaik dengan kualitas makanan dan layanan yang memuaskan. </p>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+          <div style="flex: 1; min-width: 250px; background: white; border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <i class="fas fa-utensils" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+            <h3>Makanan Berkualitas</h3>
+            <p>Kami hanya bekerja sama dengan restoran terpilih yang menggunakan bahan berkualitas dan proses memasak yang higienis.</p>
+          </div>
+          <div style="flex: 1; min-width: 250px; background: white; border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <i class="fas fa-truck" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+            <h3>Pengiriman Cepat</h3>
+            <p>Tim pengirim kami siap mengantar pesanan Anda dengan cepat agar makanan tetap hangat dan lezat saat sampai di rumah Anda.</p>
+          </div>
+          <div style="flex: 1; min-width: 250px; background: white; border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <i class="fas fa-headset" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+            <h3>Layanan Pelanggan</h3>
+            <p>Tim layanan pelanggan kami siap membantu Anda dengan pertanyaan atau masalah yang mungkin Anda hadapi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="kontak" class="menu-section">
+      <div class="container">
+        <h2 class="section-title">Hubungi Kami</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 50px;">
+          <div style="flex: 1; min-width: 300px;">
+            <h3 style="margin-bottom: 20px;">Informasi Kontak</h3>
+            <p>
+              <i class="fas fa-map-marker-alt" style="margin-right: 10px; color: var(--primary-color);"></i> Jl. Makan Enak No. 123, Jakarta
+            </p>
+            <p>
+              <i class="fas fa-phone" style="margin-right: 10px; color: var(--primary-color);"></i> +62 123 4567 890
+            </p>
+            <p>
+              <i class="fas fa-envelope" style="margin-right: 10px; color: var(--primary-color);"></i> info@rasakita.com
+            </p>
+            <div class="social-icons" style="margin-top: 20px;">
+              <a href="#">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+          <div style="flex: 2; min-width: 300px;">
+            <h3 style="margin-bottom: 20px;">Kirim Pesan</h3>
+            <form id="contactForm">
+              <div class="form-group">
+                <label for="contactName">Nama</label>
+                <input type="text" id="contactName" name="contactName" required minlength="3" maxlength="50" pattern="[A-Za-z\s]+" title="Hanya huruf dan spasi yang diperbolehkan">
+              </div>
+              <div class="form-group">
+                <label for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" name="contactEmail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan alamat email yang valid">
+              </div>
+              <div class="form-group">
+                <label for="contactMessage">Pesan</label>
+                <textarea id="contactMessage" name="contactMessage" required minlength="10" maxlength="500"></textarea>
+              </div>
+              <input type="hidden" id="contact_csrf_token" name="contact_csrf_token" value="">
+              <button type="submit" class="btn-primary">Kirim Pesan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Rasa <span>Kita</span>
+            </h3>
+            <p>Nikmati pengalaman kuliner terbaik dengan layanan pemesanan makanan online dari RasaKita.</p>
+            <div class="social-icons">
+              <a href="#">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Link Cepat</h3>
+            <p>
+              <a href="#beranda" style="color: white; text-decoration: none;">Beranda</a>
+            </p>
+            <p>
+              <a href="#menu" style="color: white; text-decoration: none;">Menu</a>
+            </p>
+            <p>
+              <a href="#tentang" style="color: white; text-decoration: none;">Tentang Kami</a>
+            </p>
+            <p>
+              <a href="#kontak" style="color: white; text-decoration: none;">Kontak</a>
+            </p>
+          </div>
+          <div class="footer-section">
+            <h3>Jam Operasional</h3>
+            <p>Senin - Jumat: 10:00 - 22:00</p>
+            <p>Sabtu - Minggu: 09:00 - 23:00</p>
+            <p>Hari Libur: 09:00 - 22:00</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; <span id="currentYear"></span> RasaKita. All Rights Reserved. </p>
+        </div>
+      </div>
+    </footer>
+    </div>
+    <script defer src="script.js"></script>
+    <div id="toast" style="visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 9999; bottom: 30px; right: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+      <div id="toast-icon" style="float: left; margin-right: 10px;">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div id="toast-message">Notifikasi</div>
+    </div>
+  </body>
+</html>
